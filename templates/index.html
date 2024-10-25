@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Baixador de Vídeos do YouTube</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>
 <body>
     <div class="container mt-5">
@@ -16,56 +15,7 @@
             </div>
             <button type="submit" class="btn btn-primary">Baixar</button>
         </form>
-        
-        <div id="message" class="alert mt-3" role="alert">{{ message }}</div>
-
-        <h2 class="mt-5">Arquivos Disponíveis para Download:</h2>
-        <ul id="file-list" class="list-group mt-3">
-            {% if arquivos %}
-                {% for arquivo in arquivos %}
-                    <li class="list-group-item">
-                        <a href="{{ url_for('downloads', filename=arquivo) }}" download>{{ arquivo }}</a>
-                    </li>
-                {% endfor %}
-            {% else %}
-                <li class="list-group-item">Nenhum arquivo disponível para download.</li>
-            {% endif %}
-        </ul>
+        <div id="message" class="alert mt-3" role="alert"></div>
     </div>
-
-    <script>
-        // Função para atualizar a lista de arquivos
-        function atualizarListaArquivos() {
-            fetch('/atualizar_arquivos')
-                .then(response => response.json())
-                .then(arquivos => {
-                    const fileList = document.getElementById('file-list');
-                    fileList.innerHTML = ''; // Limpa a lista existente
-                    
-                    if (arquivos.length === 0) {
-                        fileList.innerHTML = '<li class="list-group-item">Nenhum arquivo disponível para download.</li>';
-                    } else {
-                        arquivos.forEach(arquivo => {
-                            const listItem = document.createElement('li');
-                            listItem.className = 'list-group-item';
-                            listItem.innerHTML = `<a href="/downloads/${arquivo}" download>${arquivo}</a>`;
-                            fileList.appendChild(listItem);
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro ao atualizar a lista de arquivos:', error);
-                });
-        }
-
-        // Chama a função de atualização a cada 5 segundos
-        setInterval(atualizarListaArquivos, 5000);
-
-        document.addEventListener('DOMContentLoaded', atualizarListaArquivos);
-    </script>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
