@@ -23,12 +23,12 @@
             var intervalo = setInterval(function() {
                 // Faz uma requisição AJAX para verificar o status do download
                 var xhr = new XMLHttpRequest();
-                xhr.open('GET', '/downloads', true);
+                xhr.open('GET', '/tmp/downloads', true);
                 xhr.onload = function() {
                     if (xhr.status == 200) {
                         // Inicia o download do arquivo
                         var link = document.createElement('a');
-                        link.href = '/downloads';
+                        link.href = '/tmp/downloads';
                         link.download = true;
                         document.body.appendChild(link);
                         link.click();
