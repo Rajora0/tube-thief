@@ -1,11 +1,11 @@
-from flask import Flask, render_template, request, send_from_directory
+from flask import Flask, render_template, request, send_from_directory, jsonify
 import yt_dlp
 import os
 import threading
 
 app = Flask(__name__)
 
-# Configura o diretório temporário no Vercel
+# Configura o diretório temporário para os downloads
 app.config['UPLOAD_FOLDER'] = '/tmp/downloads'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
@@ -25,7 +25,9 @@ def index():
             return render_template("index.html", message="Download iniciado em background!")
         except Exception as e:
             return render_template("index.html", message=f"Erro ao iniciar download: {e}")
-    return render_template("index.html", download_completo=download_completo)
+    
+    arquivos = os.listdir(app.config['UPLOAD_FOLDER'])
+    return render_template("index.html", download_completo=download_completo, arquivos=arquivos)
 
 def download_video(url):
     global download_completo
@@ -43,18 +45,19 @@ def download_video(url):
         ydl.download([url])
     download_completo = True  # Define o status do download como completo
 
-@app.route("/downloads")
-def downloads():
-    global download_completo
-    if download_completo:
-        arquivos = os.listdir(app.config['UPLOAD_FOLDER'])
-        if arquivos:
-            ultimo_arquivo = max(arquivos, key=lambda x: os.path.getctime(os.path.join(app.config['UPLOAD_FOLDER'], x)))
-            return send_from_directory(app.config['UPLOAD_FOLDER'], ultimo_arquivo, as_attachment=True)
-        else:
-            return "Nenhum arquivo encontrado", 404
-    else:
-        return "Download ainda não concluído", 202  # Código 202 para "Accepted"
+@app.route("/downloads/<filename>")
+def downloads(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
+
+# Novo endpoint para retornar a lista de arquivos em JSON
+@app.route("/atualizar_arquivos")
+def atualizar_arquivos():
+    arquivos = os.listdir(app.config['UPLOAD_FOLDER'])
+    return jsonify(arquivos)
+
+@app.route("/favicon.ico")
+def favicon():
+    return app.send_static_file('favicon.ico')
 
 if __name__ == "__main__":
     app.run(debug=True)
