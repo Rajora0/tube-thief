@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
+    <meta charset="UTF-8">
     <title>Baixador de Vídeos do YouTube</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
@@ -23,31 +24,39 @@
             var intervalo = setInterval(function() {
                 // Faz uma requisição AJAX para verificar o status do download
                 var xhr = new XMLHttpRequest();
-                xhr.open('GET', '/tmp/downloads', true);
+                xhr.open('GET', '/downloads', true);
                 xhr.onload = function() {
                     if (xhr.status == 200) {
                         // Inicia o download do arquivo
                         var link = document.createElement('a');
-                        link.href = '/tmp/downloads';
-                        link.download = true;
+                        link.href = '/downloads';
+                        link.setAttribute('download', true);
                         document.body.appendChild(link);
                         link.click();
                         document.body.removeChild(link);
                         clearInterval(intervalo);
+                        document.getElementById("message").textContent = "Download concluído!";
+                        document.getElementById("message").classList.add("alert-success");
                     } else if (xhr.status == 202) {
                         // Download ainda não concluído, aguarda mais um pouco
                         console.log("Download ainda não concluído");
                     } else {
                         // Erro no download, exibe a mensagem de erro
                         document.getElementById("message").textContent = "Erro ao baixar o vídeo. Tente novamente.";
+                        document.getElementById("message").classList.add("alert-danger");
                         clearInterval(intervalo);
                     }
+                };
+                xhr.onerror = function() {
+                    document.getElementById("message").textContent = "Erro de conexão.";
+                    document.getElementById("message").classList.add("alert-danger");
+                    clearInterval(intervalo);
                 };
                 xhr.send();
             }, 1000);
         }
 
-        // Chame a função de monitoramento após o download ser iniciado
+        // Chama a função de monitoramento após o download ser iniciado
         document.addEventListener('DOMContentLoaded', function() {
             monitorarDownloads();
         });
